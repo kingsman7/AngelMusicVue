@@ -6,8 +6,9 @@
           .nav-left
             .nav-item
               strong 📻  Ángel Music
-            .nav-right.nav-menu
-
+          .nav-right.nav-menu
+            router-link.nav-item(to="/") Search
+            router-link.nav-item(to="about") Us
     .hero-body
       .container.has-text-centered
         h1.title Ángel Music

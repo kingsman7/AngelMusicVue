@@ -1,11 +1,13 @@
 <template lang="pug">
   .container
     .columns
-      .column.is-5.is-offset-4
+      .column
+      .column
         .notification.is-danger(v-show="notification")
           slot(name="body") Notificacion default
         .notification.is-success(v-show="!notification")
           slot(name="body") Notificacion default
+      .column    
 </template>
 
 <script>
