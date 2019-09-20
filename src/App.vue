@@ -1,69 +1,90 @@
 <template lang="pug">
   #app
-    .columns
-      .column
-      .column
-        h1 Tareas y horas
-        br
-        input.input.is-8(type="text" v-model="title" name="title" placeholder="title" )
-        input.input.is-8(type="text" v-model="time" name="time" placeholder="time" ) 
-        input.button.link(type="submit" name="submit" @click="addTask(title,time)")
-        p(v-if="totalTime!==0") {{totalTime}}
-        div(v-for="(task,i) in tasks")
-          ul
-            li {{task.title}} - {{task.time}}   
-            button.delete.is-medium(@click="removeTask(i)")
-            br
-      .column
+    PmHeader
+    pm-notification(:notification="showNotification")
+      p(slot="body" v-if="showNotification") no se encontraron resultados
+      p(slot="body" v-else="showNotification") resultados {{serachMessage}}
+  
+    pm-loading(v-show="isLoading")
+
+    section.section(v-show="!isLoading")
+      nav.nav
+        .container
+          input.input(type="text" placeholder="Search Sons" v-model="searchQuery")
+          a.is-info.button.is-large(@click="search") Search
+          a.is-danger.button.is-large &times; 
+      .container
+      
+      .container.results
+        .columns.is-multiline
+          .column.is-one-quarter(v-for="track in tracks")
+              pm-track(
+                :class="{'is-active': track.id ===selectedTrack }"
+                :track="track",
+                @select="setSelected"
+              )
+              
+    PmFooter            
+
 </template>
 
 <script>
+import trackService from '@/services/track';
+import PmHeader from '@/components/layout/Header.vue'
+import PmFooter from '@/components/layout/Footer.vue'
+import PmTrack from '@/components/Track.vue'
+import PmLoading from  '@/components/shared/Loader.vue'
+import PmNotification from '@/components/shared/Notification.vue'
+
 export default {
   name: 'app',
-  
+  components:{
+    PmHeader,
+    PmFooter,
+    PmTrack,
+    PmLoading,
+    PmNotification
+  },
   data () {
     return {
-      title:'',
-      time:0,
-      tasks:[]
+      searchQuery:'',
+      tracks:[],
+      isLoading : false,
+      showNotification: false,
+      selectedTrack:''
     }
   },
 
   computed:{
-    totalTime () {
-      let total = 0
-      this.tasks.map(function(sum){
-        total += sum.time
-      })
-      return total
+    serachMessage () {
+      return `encontrados: ${this.tracks.length}`
     }
   },
-  created(){
-    this.tasks = JSON.parse(localStorage.getItem('tasks')) || []
+  
+  watch:{
+    showNotification () {
+      if(this.showNotification){
+       setTimeout(()=>{
+         this.showNotification = false
+       }, 3000) 
+      }
+    }
   },
+
   methods:{
-    addTask (title, time) {
-      if(title, time){
-        const newTask ={
-          title,
-          time : parseInt(time)        
-        }
-        this.tasks.push(newTask);
-      }else(
-        alert('debe llenar todos los campos')
-      )
-      localStorage.setItem('tasks',JSON.stringify(this.tasks))
-      this.cancel ()
+    search () {
+      if (!this.searchQuery){return}
+      this.isLoading = true
+      trackService.search(this.searchQuery)
+      .then(res=>{
+        this.showNotification = res.tracks.total === 0
+        this.tracks = res.tracks.items
+        this.isLoading = false
+      }) 
     },
-    cancel () {
-      this.title = '',
-      this.time = ''
-    },
-    removeTask (i) {
-      let remove = this.tasks.splice(i,1);
-      localStorage.setItem('tasks',JSON.stringify(this.tasks))
-      return remove
-    } 
+    setSelected (id) {
+      this.selectedTrack = id
+    }
   }
 }
 </script>
@@ -77,26 +98,15 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 </style>
 <style lang="scss">
   @import './scss/main.scss';
+      .results {
+        margin-top: 50px;
+      }
+    
+      .is-active {
+        border: 3px #23d160 solid;
+      }
 </style>
 
