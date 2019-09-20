@@ -1,6 +1,10 @@
-# todo-basic-vuejs
+# vuejs Profesional
 
-> is a tasks list made in Vuejs, Bulma y Pug
+> Proyecto donde se utilizan consectos de Vue como 
+>Expresiones, directivas, Data Binding, Computed properties
+>Watchers, Eventos, slots, creacion de plugins personalizados, 
+>Vue Router, Modifiers, filtros, Directivas Personalizadas, Mixins
+>Flux, Vuex y Nux
 > es una lista de tareas echa en Vuejs, Bulma y Pug 
 
 ## Build Setup
