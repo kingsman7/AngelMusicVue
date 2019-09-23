@@ -16,17 +16,21 @@
             strong {{track.name}}
           p.subtitle.is-6 {{track.artists[0].name}}
       .content
-        small {{track.duration_ms}}
+        small {{track.duration_ms | ms-to-mm}}
         nav.level
           .level-left
-            a.level-item
+            button.level-item.button.is-primary
               span.icon.is.small(@click="selectTrack") ▶️
-            a.level-item
+            button.level-item.button.is-warning
               span.icon.is.small(@click="goToTrack(track.id)") Go
 </template>
 
 <script>
+import trackMixin from '@/mixins/track.js'
+
   export default {
+    mixins: [ trackMixin ],
+    
     props:{
       track:{
         type:Object,
@@ -35,16 +39,9 @@
     },
     
     methods:{
-      selectTrack () {
-      //Emite el evento desde el componente hijo al comonente padre con un $emit
-      //este #emit resive parametros; 
-      //el nombre del evento que estara en el componente padre
-      //la información a pasar
-        this.$emit('select', this.track.id)
-        this.$bus.$emit('set-track', this.track)
-      },
-
+      
       goToTrack (id) {
+        if (!this.track.preview_url){return}
         this.$router.push({ name: 'track', params: { id } })
       }
     }

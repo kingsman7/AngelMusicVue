@@ -1,15 +1,22 @@
 <template lang="pug">
   main
-    pm-notification(:notification="showNotification")
-      p(slot="body" v-if="showNotification") no se encontraron resultados
-      p(slot="body" v-else="showNotification") resultados {{serachMessage}}
-  
-    pm-loading(v-show="isLoading")
+    transition(name="move")
+      pm-notification(:notification="showNotification")
+        p(slot="body" v-if="showNotification") no se encontraron resultados
+        p(slot="body" v-else="showNotification") resultados {{serachMessage}}
+    
+    transition(name="move")
+      pm-loading(v-show="isLoading")
 
     section.section(v-show="!isLoading")
       nav.nav
         .container
-          input.input(type="text" placeholder="Search Sons" v-model="searchQuery")
+          input.input(
+            type="text", 
+            placeholder="Search Sons", 
+            v-model="searchQuery",
+            @keyup.enter="search"
+            )
           a.is-info.button.is-large(@click="search") Search
           a.is-danger.button.is-large &times; 
       .container
@@ -18,6 +25,7 @@
         .columns.is-multiline
           .column.is-one-quarter(v-for="track in tracks")
               pm-track(
+                v-blur="track.preview_url"
                 :class="{'is-active': track.id ===selectedTrack }"
                 :track="track",
                 @select="setSelected"
